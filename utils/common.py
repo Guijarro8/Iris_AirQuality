@@ -9,6 +9,7 @@ from sklearn.decomposition import PCA
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+import joblib
 
 ####################################################################################################
 # - df: DataFrame to generate a Report
@@ -16,6 +17,7 @@ from sklearn.preprocessing import StandardScaler
 ####################################################################################################
 def print_report(df,df_title):
     """Exports an html file with the profiling, distributions and correlations of the DataFrame variables."""
+
     filepath = f"{os.path.abspath('')}/reports/"
     profile = ProfileReport(df, title=f"{df_title}")
     profile.to_file(f"{filepath}{df_title}_report.html")
@@ -26,7 +28,7 @@ def print_report(df,df_title):
 # return: standarized and selected more-explainable PCA Dataframe.
 ####################################################################################################
 def std_pca(df,pca_threshold=0.999):
-    """Standarize a DataFrame and perform a PCA,"""
+    """Standarize a DataFrame and perform a PCA."""
     
     # Process flow as a pipeline.
     std_pca_pipe = Pipeline([('std', StandardScaler()), ('pca', PCA())])
@@ -53,7 +55,8 @@ def std_pca(df,pca_threshold=0.999):
 # - figure_filename: name of the file exported.
 ####################################################################################################
 def plot_pca_multiclass(labels, df_pca, title,  figure_filename=None):
-    """ Plot and save a 2D distribution graph of the PCA of a multiclass dataframe"""
+    """ Plot and save a 2D distribution graph of the PCA of a multiclass dataframe."""
+
     figure_filepath = f"{os.path.abspath('')}/reports"
     
     # Plot the dataset and color clusters.        
@@ -68,3 +71,28 @@ def plot_pca_multiclass(labels, df_pca, title,  figure_filename=None):
     # Export figure as image.
     if (figure_filename is not None):
         plt.savefig(f"{figure_filepath}/{figure_filename}.png")
+
+
+
+####################################################################################################
+# - model: Model to save.
+# - model_filename: Model's name.
+####################################################################################################
+def save_model (model, model_filename):
+    """Save model for future use."""
+
+    figure_filepath = f"{os.path.abspath('')}/models"
+    joblib.dump(model, f"{figure_filepath}/{model_filename}.pkl")
+
+
+####################################################################################################
+# - model_filename: Model's name.
+# return: Model .
+####################################################################################################
+def load_model (model_filename):
+    """Load a saved model."""
+
+    figure_filepath = f"{os.path.abspath('')}/models"
+    model = joblib.load(f"{figure_filepath}/{model_filename}.pkl")
+
+    return model
