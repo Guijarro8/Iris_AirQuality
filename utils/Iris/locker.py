@@ -1,6 +1,22 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 
 from sklearn import svm, datasets
+from sklearn import datasets
+from sklearn.ensemble import RandomForestClassifier,GradientBoostingClassifier
+from sklearn.multiclass import OneVsRestClassifier, OneVsOneClassifier, OutputCodeClassifier
+from sklearn.metrics import roc_curve, auc
+from sklearn.preprocessing import label_binarize
+from sklearn.svm import LinearSVC
+from statistics import mean
+
+from ..common import split_train_test
+
+
+
+dic_iris={0:'setosa', 
+          1:'versicolor',
+          2:'virginica'}
 
 
 ####################################################################################################
@@ -15,64 +31,126 @@ def load_iris_df():
     
     #Introduce target numeric and string
     df_iris['target'] = iris.target
-    dic_iris={0:'setosa', 
-          1:'versicolor',
-          2:'virginica'}
     df_iris['target_name'] =df_iris['target'].map(dic_iris)
     
     return df_iris
 
-def clasification_iris(df_iris):
-      """Build the Clasification model for the iris dataset."""
-      
-      from sklearn.metrics import roc_curve, auc
-      from sklearn import datasets
-      from sklearn.multiclass import OneVsRestClassifier
-      from sklearn.svm import LinearSVC
-      from sklearn.preprocessing import label_binarize
-      from sklearn.cross_validation import train_test_split
-      import matplotlib.pyplot as plt
-
-      iris = datasets.load_iris()
-      X, y = iris.data, iris.target
-
-      y = label_binarize(y, classes=[0,1,2])
-      n_classes = 3
-
-      # shuffle and split training and test sets
-      X_train, X_test, y_train, y_test =\
-      train_test_split(X, y, test_size=0.33, random_state=0)
-
-      # classifier
-      clf = OneVsRestClassifier(LinearSVC(random_state=0))
-      y_score = clf.fit(X_train, y_train).decision_function(X_test)
-
-
-
 ####################################################################################################
-# - labels: clases.
-# - df_pca: DataFrame to visualize.
-# - title: final detail of plot title.
-# - figure_filename: name of the file exported.
+# - df_iris: Iris Dataframe.
+# - fields_input:  Features to input in the model of the dataframe
+# - fields_target: Output of the dataframe
 ####################################################################################################
-def plot_pca_multiclass(labels, df_pca, title,  figure_filename=None):
+def classification_OvsR(df_features,target):
+    """Build the OneVsRest Classification model for the iris dataset."""
     
-    fpr = dict()
-    tpr = dict()
-    roc_auc = dict()
-    for i in range(n_classes):
-        fpr[i], tpr[i], _ = roc_curve(y_test[:, i], y_score[:, i])
-        roc_auc[i] = auc(fpr[i], tpr[i])
+    # Shuffle and split training and test sets
+    X_train, X_test, y_train, y_test = split_train_test(df_features, target)
 
-    # Plot of a ROC curve for a specific class
+    # Classifier and evaluation
+    clf = OneVsRestClassifier(LinearSVC(random_state=0))
+    y_score = clf.fit(X_train, y_train.values.ravel()).predict(X_test)
+    eval_classification(y_test, y_score,'Classification_OneVsRest')
+    return clf, y_test, y_score
+
+####################################################################################################
+# - df_iris: Iris Dataframe.
+# - fields_input:  Features to input in the model of the dataframe
+# - fields_target: Output of the dataframe
+####################################################################################################
+def classification_OvsO(df_features,target):
+    """Build the OneVsOne Classification model for the iris dataset."""
+    
+    # Shuffle and split training and test sets
+    X_train, X_test, y_train, y_test = split_train_test(df_features, target)
+
+    # Classifier and evaluation
+    clf = OneVsOneClassifier(LinearSVC(random_state=0))
+    y_score = clf.fit(X_train, y_train.values.ravel()).predict(X_test)
+    eval_classification(y_test, y_score, 'Classification_OneVsOne')
+    return clf
+
+####################################################################################################
+# - df_iris: Iris Dataframe.
+# - fields_input:  Features to input in the model of the dataframe
+# - fields_target: Output of the dataframe
+####################################################################################################
+def classification_outputcode(df_features,target):
+    """Build the OutputCode Classification model for the iris dataset."""
+    
+    # Shuffle and split training and test sets
+    X_train, X_test, y_train, y_test = split_train_test(df_features, target)
+
+    # Classifier and evaluation
+    clf = OutputCodeClassifier(LinearSVC(random_state=0))
+    y_score = clf.fit(X_train, y_train.values.ravel()).predict(X_test)
+    eval_classification(y_test, y_score, 'Classification_OutputCode')
+    return clf
+
+####################################################################################################
+# - df_iris: Iris Dataframe.
+# - fields_input:  Features to input in the model of the dataframe
+# - fields_target: Output of the dataframe
+####################################################################################################
+def classification_randomforest(df_features,target):
+    """Build the RandomForest Classification model for the iris dataset."""
+    
+    # Shuffle and split training and test sets
+    X_train, X_test, y_train, y_test = split_train_test(df_features, target)
+
+    # Classifier and evaluation
+    clf = RandomForestClassifier()
+    y_score = clf.fit(X_train, y_train.values.ravel()).predict(X_test)
+    eval_classification(y_test, y_score, 'Classification_RandomForest')
+    return clf
+
+    GradientBoostingClassifier
+####################################################################################################
+# - df_iris: Iris Dataframe.
+# - fields_input:  Features to input in the model of the dataframe
+# - fields_target: Output of the dataframe
+####################################################################################################
+def classification_model(df_features,target,Classifier,Classifier_name):
+    """Build the RandomForest Classification model for the iris dataset."""
+    
+    # Shuffle and split training and test sets
+    X_train, X_test, y_train, y_test = split_train_test(df_features, target)
+
+    # Classifier and evaluation
+    clf = OneVsOneClassifier(Classifier)
+    y_score = clf.fit(X_train, y_train.values.ravel()).predict(X_test)
+    eval_classification(y_test, y_score, Classifier_name)
+    return clf
+
+####################################################################################################
+# - y_test: Output values of test set.
+# - y_score: Output values predicted by the model.
+# - n_classes: Number os classes of the multiclass model.
+####################################################################################################
+def eval_classification(y_test, y_score, model_name,n_classes = 3):
+    """Print the metrics of classification"""
+    y_test = pd.DataFrame(label_binarize(y_test, classes=[0,1,2]))
+    y_score = pd.DataFrame(label_binarize(y_score, classes=[0,1,2]))
+    
+    SEN = []
+    SPE = []
+    AC = []
     for i in range(n_classes):
-        plt.figure()
-        plt.plot(fpr[i], tpr[i], label='ROC curve (area = %0.2f)' % roc_auc[i])
-        plt.plot([0, 1], [0, 1], 'k--')
-        plt.xlim([0.0, 1.0])
-        plt.ylim([0.0, 1.05])
-        plt.xlabel('False Positive Rate')
-        plt.ylabel('True Positive Rate')
-        plt.title('Receiver operating characteristic example')
-        plt.legend(loc="lower right")
-        plt.show()
+        metrics = y_test[[i]].rename(columns={i:'true'})
+        metrics['prediction'] = y_score[i]
+        TN = eval_count(metrics, 0,0)
+        FN = eval_count(metrics, 1,0)
+        TP = eval_count(metrics, 1,1)
+        FP = eval_count(metrics, 0,1)
+
+        SEN.append(TP/(TP+FN))
+        SPE.append(TN/(TN+FP))
+        AC.append((TN+TP)/(TP+FN+TN+FP))
+
+    print(f"[{model_name}] - Acurracy: {pourcentage(AC)}% - Sensitivity: {pourcentage(SEN)}% - Specificity: {pourcentage(SPE)}%")
+
+def eval_count(df,label_true,label_predict):
+    return len (df[(df['true'] == label_true) & (df['prediction'] == label_predict)])
+
+def pourcentage(x):
+    return int(mean(x)*1000)/10
+

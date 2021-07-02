@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from pandas_profiling import ProfileReport
 from sklearn import svm, datasets,preprocessing
 from sklearn.decomposition import PCA
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 import joblib
@@ -73,6 +73,21 @@ def plot_pca_multiclass(labels, df_pca, title,  figure_filename=None):
         plt.savefig(f"{figure_filepath}/{figure_filename}.png")
 
 
+####################################################################################################
+# - df: Data to split.
+# - target: Data target to split 
+# - test_size : Pourcentage of the data frame  for testing (Default =0.2)
+# return: X_train, X_test, y_train, y_test : data splited 
+####################################################################################################
+def split_train_test(df, target, test_size = 0.3, random_state=123):
+    """Split data into training and test sets"""
+
+    X_train, X_test, y_train, y_test = train_test_split(df, target, 
+                                                            test_size=test_size, 
+                                                            random_state=random_state, 
+                                                            stratify=target)
+    return X_train, X_test, y_train, y_test
+
 
 ####################################################################################################
 # - model: Model to save.
@@ -87,7 +102,7 @@ def save_model (model, model_filename):
 
 ####################################################################################################
 # - model_filename: Model's name.
-# return: Model .
+# return: Model  to load.
 ####################################################################################################
 def load_model (model_filename):
     """Load a saved model."""
