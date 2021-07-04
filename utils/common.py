@@ -1,5 +1,6 @@
 import os
 
+import joblib
 import pandas as pd
 
 import matplotlib.pyplot as plt
@@ -9,7 +10,7 @@ from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
-import joblib
+from statistics import mean
 
 ####################################################################################################
 # - df: DataFrame to generate a Report
@@ -27,9 +28,8 @@ def print_report(df,df_title):
 # - df: DataFrame to standarize.
 # return: standarized and selected more-explainable PCA Dataframe.
 ####################################################################################################
-def std_pca(df,pca_threshold=0.999):
+def std_pca(df,pca_threshold=0.98):
     """Standarize a DataFrame and perform a PCA."""
-    
     # Process flow as a pipeline.
     std_pca_pipe = Pipeline([('std', StandardScaler()), ('pca', PCA())])
 
@@ -42,9 +42,15 @@ def std_pca(df,pca_threshold=0.999):
      # Select non-explained variables.
     df_pca_exp_var = pca_model.explained_variance_ratio_.cumsum()
     df_pca_filter = df_pca.copy()
-    for i_var in range(len(df_pca_exp_var)):
+    reduction = 0
+    for i_var in range(len(df_pca_exp_var)-1):
             if (df_pca_exp_var[i_var] > pca_threshold):
-                del df_pca_filter[i_var]
+                del df_pca_filter[i_var+1]
+                reduction = reduction + 1
+    
+   
+    var_explained = df_pca_exp_var[len(df_pca_exp_var) - (reduction + 1)]
+    print (f"\n Reducimos {reduction} dimension/es del conjunto de datos, con un {int(var_explained*1000)/10}% de la varianza explicada.\n")
     return df_pca_filter
 
 
@@ -76,16 +82,24 @@ def plot_pca_multiclass(labels, df_pca, title,  figure_filename=None):
 ####################################################################################################
 # - df: Data to split.
 # - target: Data target to split 
-# - test_size : Pourcentage of the data frame  for testing (Default =0.2)
+# - test_size : Percentage of the data frame  for testing (Default =0.2)
 # return: X_train, X_test, y_train, y_test : data splited 
 ####################################################################################################
 def split_train_test(df, target, test_size = 0.3, random_state=123):
     """Split data into training and test sets"""
 
-    X_train, X_test, y_train, y_test = train_test_split(df, target, 
-                                                            test_size=test_size, 
-                                                            random_state=random_state, 
-                                                            stratify=target)
+    try:
+        X_train, X_test, y_train, y_test = train_test_split(df, target, 
+                                                            test_size = test_size, 
+                                                            random_state = random_state, 
+                                                            stratify = target)
+    except:
+        X_train, X_test, y_train, y_test = train_test_split(df, target, 
+                                                        test_size = test_size, 
+                                                        random_state = random_state, 
+                                                        stratify = None)
+
+                                                        
     return X_train, X_test, y_train, y_test
 
 
@@ -111,3 +125,10 @@ def load_model (model_filename):
     model = joblib.load(f"{figure_filepath}/{model_filename}.pkl")
 
     return model
+
+####################################################################################################
+# - x: float €[0,1].
+# return: percentage .
+####################################################################################################
+def percentage(x):
+    return int(mean(x)*1000)/10
