@@ -24,11 +24,12 @@ dic_iris={0:'setosa',
           2:'virginica'}
 
 
-####################################################################################################
-# return1: Iris Dataframe.
-####################################################################################################
 def load_iris_df():
-    """Import Iris Dataframe."""
+    '''
+    Import Iris Dataframe.
+    # return1: Iris Dataframe.
+    '''
+
 
     #Load Data
     iris = datasets.load_iris()
@@ -40,12 +41,12 @@ def load_iris_df():
     
     return df_iris
 
-####################################################################################################
-# - df_iris: Iris Dataframe.
-# - fields_input:  Features to input in the model of the dataframe
-# - fields_target: Output of the dataframe
-####################################################################################################
 def classify(df_features,target,classifier):
+    '''
+    # - df_iris: Iris Dataframe.
+    # - fields_input:  Features to input in the model of the dataframe
+    # - fields_target: Output of the dataframe
+    '''
         
     # Shuffle and split training and test sets
     x_train, x_test, y_train, y_test = split_train_test(df_features, target)
@@ -70,14 +71,15 @@ def classify(df_features,target,classifier):
 
     return scores, clf
 
-####################################################################################################
-# return: df_pca_iris: Standarized- PCA of the Iris Dataframe.
-# return: df_iris: Iris Dataframe.
-# return: fields_input:  Features to input in the model of the dataframe
-# return: fields_target: Output of the dataframe
-####################################################################################################
 def load_explore_iris(): 
-    """Load, explore  Iris Data generating a profiling report and implement a PCA."""
+    '''
+    Load, explore  Iris Data generating a profiling report and implement a PCA.
+    # return: df_pca_iris: Standarized- PCA of the Iris Dataframe.
+    # return: df_iris: Iris Dataframe.
+    # return: fields_input:  Features to input in the model of the dataframe
+    # return: fields_target: Output of the dataframe
+    '''
+
     
     #Load Data
 
@@ -104,13 +106,13 @@ def load_explore_iris():
 
     return df_pca_iris, df_iris, fields_input, fields_target 
 
-####################################################################################################
-# - df_iris: Iris Dataframe.
-# - fields_input:  Features to input in the model of the dataframe
-# - fields_target: Output of the dataframe
-# return: results of the evaluation
-####################################################################################################
 def classification_iris(df_pca_iris, df_iris, fields_input_iris, fields_target_iris):
+    '''
+    # - df_iris: Iris Dataframe.
+    # - fields_input:  Features to input in the model of the dataframe
+    # - fields_target: Output of the dataframe
+    # return: results of the evaluation
+    '''
     
     results={}
     #Define classifiers and params

@@ -12,24 +12,24 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from statistics import mean
 
-####################################################################################################
-# - df: DataFrame to generate a Report
-# - df_title: title of the DataFrame
-####################################################################################################
 def print_report(df,df_title):
-    """Exports an html file with the profiling, distributions and correlations of the DataFrame variables."""
+    '''
+    Exports an html file with the profiling, distributions and correlations of the DataFrame variables.
+    # - df: DataFrame to generate a Report
+    # - df_title: title of the DataFrame
+    '''
 
     filepath = f"{os.path.abspath('')}/reports/"
     profile = ProfileReport(df, title=f"{df_title}")
     profile.to_file(f"{filepath}{df_title}_report.html")
 
 
-####################################################################################################
-# - df: DataFrame to standarize.
-# return: standarized and selected more-explainable PCA Dataframe.
-####################################################################################################
 def std_pca(df,pca_threshold=0.98):
-    """Standarize a DataFrame and perform a PCA."""
+    '''
+    Standarize a DataFrame and perform a PCA.
+    # - df: DataFrame to standarize.
+    # return: standarized and selected more-explainable PCA Dataframe.
+    '''
     # Process flow as a pipeline.
     std_pca_pipe = Pipeline([('std', StandardScaler()), ('pca', PCA())])
 
@@ -54,14 +54,14 @@ def std_pca(df,pca_threshold=0.98):
     return df_pca_filter
 
 
-####################################################################################################
-# - labels: clases.
-# - df_pca: DataFrame to visualize.
-# - title: final detail of plot title.
-# - figure_filename: name of the file exported.
-####################################################################################################
 def plot_pca_multiclass(labels, df_pca, title,  figure_filename=None):
-    """ Plot and save a 2D distribution graph of the PCA of a multiclass dataframe."""
+    ''' 
+    Plot and save a 2D distribution graph of the PCA of a multiclass dataframe.
+    # - labels: clases.
+    # - df_pca: DataFrame to visualize.
+    # - title: final detail of plot title.
+    # - figure_filename: name of the file exported.
+    '''
 
     figure_filepath = f"{os.path.abspath('')}/reports"
     
@@ -79,14 +79,14 @@ def plot_pca_multiclass(labels, df_pca, title,  figure_filename=None):
         plt.savefig(f"{figure_filepath}/{figure_filename}.png")
 
 
-####################################################################################################
-# - df: Data to split.
-# - target: Data target to split 
-# - test_size : Percentage of the data frame  for testing (Default =0.2)
-# return: X_train, X_test, y_train, y_test : data splited 
-####################################################################################################
 def split_train_test(df, target, test_size = 0.3, random_state=123):
-    """Split data into training and test sets"""
+    '''
+    Split data into training and test sets
+    # - df: Data to split.
+    # - target: Data target to split 
+    # - test_size : Percentage of the data frame  for testing (Default =0.2)
+    # return: X_train, X_test, y_train, y_test : data splited 
+    '''
 
     try:
         X_train, X_test, y_train, y_test = train_test_split(df, target, 
@@ -102,33 +102,32 @@ def split_train_test(df, target, test_size = 0.3, random_state=123):
                                                         
     return X_train, X_test, y_train, y_test
 
-
-####################################################################################################
-# - model: Model to save.
-# - model_filename: Model's name.
-####################################################################################################
 def save_model (model, model_filename):
-    """Save model for future use."""
+    '''
+    Save model for future use.
+    # - model: Model to save.
+    # - model_filename: Model's name.
+    '''
 
     figure_filepath = f"{os.path.abspath('')}/models"
     joblib.dump(model, f"{figure_filepath}/{model_filename}.pkl")
 
 
-####################################################################################################
-# - model_filename: Model's name.
-# return: Model  to load.
-####################################################################################################
 def load_model (model_filename):
-    """Load a saved model."""
+    '''
+    Load a saved model.
+    # - model_filename: Model's name.
+    # return: Model  to load.
+    '''
 
     figure_filepath = f"{os.path.abspath('')}/models"
     model = joblib.load(f"{figure_filepath}/{model_filename}.pkl")
 
     return model
 
-####################################################################################################
-# - x: float €[0,1].
-# return: percentage .
-####################################################################################################
 def percentage(x):
+    '''
+    # - x: float €[0,1].
+    # return: percentage .
+    '''
     return int(mean(x)*1000)/10

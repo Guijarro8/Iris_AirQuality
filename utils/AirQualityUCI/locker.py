@@ -15,11 +15,11 @@ from sklearn.preprocessing import label_binarize
 
 from ..common import split_train_test, percentage, print_report, std_pca, plot_pca_multiclass, save_model, load_model
 
-####################################################################################################
-# return: AirQuality Dataframe.
-####################################################################################################
 def load_airquality_df():
-    """Import Iris Dataframe."""
+    '''
+    Import Iris Dataframe.
+    # return: AirQuality Dataframe.
+    '''
 
     path = f"{os.path.abspath('')}/utils/AirQualityUci/data/AirQualityUci.csv"
     df_airquality = pd.read_csv(path,sep=";", decimal=",")
@@ -29,17 +29,17 @@ def load_airquality_df():
 
     return df_airquality
 
-####################################################################################################
-# - df_airquality: AirQuality Dataframe.
-# - missing_treshold_column: Treshold pourcentage of missing values fro dropping a column
-# - missing_treshold_row: Treshold pourcentage of missing values fro dropping a row
-# - fields_input: Quantitative variables
-# return 1: AirQuality Dataframe treated.
-# return 2: Update quantitative variables.
-####################################################################################################
 
 def treatment_airquality_missing_values (df_airquality,fields_input, missing_treshold_column = 0.30, missing_treshold_row = 0.30 ):
-    """Treating missing values in the Airquality data frame."""
+    '''
+    Treating missing values in the Airquality data frame.
+    # - df_airquality: AirQuality Dataframe.
+    # - missing_treshold_column: Treshold pourcentage of missing values fro dropping a column
+    # - missing_treshold_row: Treshold pourcentage of missing values fro dropping a row
+    # - fields_input: Quantitative variables
+    # return 1: AirQuality Dataframe treated.
+    # return 2: Update quantitative variables.
+    '''
 
     #Drop all the empty rows and empty columns
     df_airquality = df_airquality.dropna(how="all", axis=1).dropna(how="all", axis=0)
@@ -76,7 +76,7 @@ def treatment_airquality_missing_values (df_airquality,fields_input, missing_tre
 
 
 def load_explore_airquality(): 
-    """Load, explore  AirQuality Data generating a profiling report and implement a PCA."""
+    '''Load, explore  AirQuality Data generating a profiling report and implement a PCA.'''
     
     #Load Data 
     df_airquality = load_airquality_df()
@@ -104,14 +104,14 @@ def load_explore_airquality():
 
 
 
-####################################################################################################
-# - df_airquality: AirQuality Dataframe.
-# - fields_input:  Features to input in the model of the dataframe
-# - fields_target: Output of the dataframe
-####################################################################################################
-
 def regressor_rf (df_airquality, fields_input, fields_target):
-    """Build a Random Forest Regressor tuned with GridSearchCV."""
+    '''
+    Build a Random Forest Regressor tuned with GridSearchCV.
+    # - df_airquality: AirQuality Dataframe.
+    # - fields_input:  Features to input in the model of the dataframe
+    # - fields_target: Output of the dataframe
+    
+    '''
     
     df_features = df_airquality[fields_input]
     target = df_airquality[fields_target]
